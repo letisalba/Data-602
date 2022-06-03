@@ -19,17 +19,167 @@ import csv, json, math, pandas as pd, requests, unittest, uuid
 # ------ Create your classes here \/ \/ \/ ------
 
 # Box class declaration below here
-    
 
+'''
+        Create an immutable class Box that has private attributes length and width that takes values for length and width
+        upon construction (instantiation via the constructor). Make sure to use Python 3 semantics. Make sure the length
+        and width attributes are private and accessible only via getters. Immutable here means that any change to its internal
+        state results in a new Box being returned. This means there are no setter methods and any time the internal state
+        (length or width) is modified, a new Box is created containing the modified values. 
+        This is applicable to combine(), invert() and double()
+'''
+class Box:
+    def __init__(self, length, width) :
+        self.__length = length
+        self.__width = width
+        
+    def get_length(self) :
+        return self.__length
+    
+    def get_width(self) :
+        return self.__width
+
+ # A method called render() that prints out to the screen a box made with asterisks of length and width dimensions
+    def render(self) :
+        for x in range(self.__length) :
+            row = ' '
+            for y in range(self.__width):
+                row += '*'
+            print(row + "\n")
+            
+# A method called invert() that switches length and width with each other            
+    def invert(self):
+        self.length, self.width = self.width, self.length
+        
+ # Methods get_area() and get_perimeter() that return appropriate geometric calculations   
+    def get_area(self) :
+        return self.__length * self.__width
+    
+    def get_perimeter(self) :
+        return (self.__length + self.__width) * 2
+ 
+ # A method called double() that doubles the size of the box. Hint: Pay attention to return value here
+    def double(self) :
+        return Box(self.__length * 2, self.__width *2)
+
+# Implement __eq__ so that two boxes can be compared using ==. Two boxes are equal if their respective lengths and widths are identical.    
+    def __eq__(self, other) :
+        if self.__length == other.get_length() and self.__width == other.get_width() :
+            return True
+        else: 
+            return False
+    
+# A method get_dim that returns a tuple containing the length and width of the box
+    def get_dim(self) :
+        return(self.__length, self.__width)
+    
+# A method print_dim that prints to screen the length and width details of the box    
+    def print_dim(self) :
+        return (self.__length, self.__width)
+ 
+# A method combine() that takes another box as an argument and increases the length and width by the dimensions of the box passed in
+    def combine(self, other) :
+        self.__width += other.get_width( )
+        self.__length += other.get_length( )
+        return self
+
+ # A method get_hypot() that finds the length of the diagonal that cuts throught the middle   
+    def get_hypot(self) :
+        return math.hypot(self.__length ** 2, self.__width ** 2)
+  
+
+      
 # MangoDB class declaration below here
+'''
+ Create a class called MangoDB. The MangoDB class wraps a dictionary of dictionaries. At the the root level, each key/value will be called a collection, 
+ similar to the terminology used by MongoDB, an inferior version of MangoDB ;) A collection is a series of 2nd level key/value paries. 
+ The root value key is the name of the collection and the value is another dictionary containing arbitrary data for that collection.
 
+ For example:
+
+     {
+         'default': {
+         'version':1.0,
+         'db':'mangodb',
+         'uuid':'0fd7575d-d331-41b7-9598-33d6c9a1eae3'
+         },
+     {
+         'temperatures': {
+             1: 50,
+             2: 100,
+             3: 120
+         }
+     }
+ 
+ The above is a representation of a dictionary of dictionaries. Default and temperatures are dictionaries or collections. 
+ The default collection has a series of key/value pairs that make up the collection. 
+ The MangoDB class should create only the default collection, as shown, on instantiation including a randomly generated 
+ uuid using the uuid4() method and have the following methods:
+'''
+class MangoDB:
+    def __init__(self):
+        self.collections = {}
+        default_uuid = uuid.uuid4()
+        self.collections['default'] =  {
+            'version': 1.0,
+            'db': 'mangodb',
+            'uuid': str(default_uuid)
+            }
+               
+        '''
+display_all_collections() which iterates through every collection and prints to screen each collection names and the collection's
+content underneath and may look something like:
     
+    collection: default
+        version 1.0
+        db mangodb
+        uuid 739bd6e8-c458-402d-9f2b-7012594cd741
+    collection: temperatures
+        1 50
+        2 100 
+        '''  
+    def display_all_collections(self):
+        for col in self.collections:
+            print("collection:", col)
+            for key in self.collections[col]:
+                print("{}{}".format(key, self.collections[col][key]))
+
+# add_collection(collection_name) allows the caller to add a new collection by providing a name. The collection will be empty but will have a name.               
+    def add_collection(self, collection_name):
+        self.collections[collection_name] = {}
+        
+    def update_collection(self, collection_name, updates):
+         for key in updates:
+             self.collections[collection_name][key] = updates[key]
+
+# remove_collection() allows caller to delete a specific collection by name and its associated data        
+    def remove_collection(self, name) :
+        del self.__db[name]
+
+#list_collections() displays a list of all the collections
+    def list_collections(self):
+        print(list(self.collections.keys()))
+   
+# get_collection_size(collection_name) finds the number of key/value pairs in a given collection    
+    def get_collection_size(self, collection_name):
+        return(len(self.collections[collection_name]))
+    
+# to_json(collection_name) that converts the collection to a JSON string
+    def to_json(self, collection_name):
+        return json.dumps(self.collections[collection_name], indent = 2)
+    
+# wipe() that cleans out the db and resets it with just a default collection
+    def wipe(self):
+        self.__init__()
+        
+# get_collection_names() that returns a list of collection names
+    def get_collection_names(self):
+        return(list(self.collections.keys()))
+        
+    def get_collection(self, collection_name):
+        return self.collections[collection_name]
 
 # ------ Create your classes here /\ /\ /\ ------
-
-
-
-
 
 def exercise01():
 
@@ -67,8 +217,49 @@ def exercise01():
 '''
 
     # ------ Place code below here \/ \/ \/ ------
-
-
+    
+    # Instantiate 3 boxes of dimensions 5,10 , 3,4 and 5,10 and assign to variables box1, box2 and box3 respectively 
+    box1 = Box(5, 10)
+    box2 = Box(3, 4)
+    box3 = Box(5, 10)
+    
+    # Print dimension info for each using print_dim()
+    Box.print_dim(box1)
+    Box.print_dim(box2)
+    Box.print_dim(box3)
+    
+    # Evaluate if box1 == box2, and also evaluate if box1 == box3, print True or False to the screen accordingly
+    #print(box1==box2)
+    #print(box1==box3)
+    print(box1.__eq__(box2))
+    print(box1.__eq__(box3))
+    
+    # Combine box3 into box1 (i.e. box1.combine()) creating box4
+    box4 = box1.combine(box3)
+    
+    # Double the size of box2 creating box5
+    box5 = box2.double( )
+    
+    # Combine box5 into box4 creating box6
+    box6 = box1.combine(box2)
+    
+    # Using a for loop, iterate through and print the tuple received from calling box2's get_dim()
+    for x in box2.get_dim( ):
+        print(x)
+     
+    # Find the size of the diagonal of box2
+    print(box2.get_hypot( ))
+    # box.render()
+    # box.invert()
+    # box.render()
+    # print(box.get_area())
+    # print(box.get_perimeter())
+    # box.double()
+    # box.render()
+    # box.print_dim()
+    # print(box.get_dim())
+    # print(box.get_hypot())
+    
 
     return box1, box2, box3, box4, box5, box6
 
@@ -95,7 +286,8 @@ def exercise02():
             }
         }
     
-    The above is a representation of a dictionary of dictionaries. Default and temperatures are dictionaries or collections. The default collection has a series of key/value pairs that make up the collection. The MangoDB class should create only the default collection, as shown, on instantiation including a randomly generated uuid using the uuid4() method and have the following methods:
+    The above is a representation of a dictionary of dictionaries. Default and temperatures are dictionaries or collections. The default collection has a series of key/value pairs that make up the collection. 
+    The MangoDB class should create only the default collection, as shown, on instantiation including a randomly generated uuid using the uuid4() method and have the following methods:
         - display_all_collections() which iterates through every collection and prints to screen each collection names and the collection's content underneath and may look something like:
             collection: default
                 version 1.0
@@ -134,7 +326,33 @@ def exercise02():
     test_scores = [99,89,88,75,66,92,75,94,88,87,88,68,52]
 
     # ------ Place code below here \/ \/ \/ ------
-
+    
+    # Create an instance of MangoDB
+    md = MangoDB( )
+    
+    # Add a collection called testscores
+    md.add_collection('test_scores')
+    
+    # Take the test_scores list and insert it into the testscores collection, providing a sequential key i.e 1,2,3...
+    md.update_collection('test_scores', {i : test_scores[i] for i in range(0, len(test_scores)) } )
+    
+    # Display the size of the testscores collection
+    print('Size:', md.get_collection_size('test_scores'))
+    
+    # Display a list of collections
+    print('Collections:', md.display_all_collections())
+    print('List:', md.list_collections( ))
+    print('List Of Collections:', md.get_collection_names( ))
+    
+    # Display the db's UUID
+    print('UUID:', uuid.uuid4( ))
+    
+    # Wipe the database clean
+    md.wipe( )
+    
+    # Display the db's UUID again, confirming it has changed
+    print('UUID:', uuid.uuid4( ))
+    
     # ------ Place code above here /\ /\ /\ ------
 
 
@@ -149,7 +367,10 @@ def exercise03():
     '''
 
     # ------ Place code below here \/ \/ \/ ------
-
+    '''with open('avocado.csv') as csv_file:
+        reader = csv.reader(csv_file)
+        for row in reader :
+            print(row)'''
 
     # ------ Place code above here /\ /\ /\ ------
 
@@ -206,4 +427,3 @@ class TestAssignment3(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

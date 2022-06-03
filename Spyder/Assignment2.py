@@ -204,11 +204,8 @@ def exercise10(sentence):
     reversed = ' '
 
     # ------ Place code below here \/ \/ \/ ------
-    
-    text = sentence.replace(" ", "_")
-    text = text.swapcase
-    reversed = text[::-1]
-
+    # reversed(sentence) # ''.join(reversed(sentence)) # for i in sentence: reversed = i + reversed
+    reversed = sentence[::-1].swapcase().replace(" ", "_") 
     # ------ Place code above here /\ /\ /\ ------
     return reversed
 
